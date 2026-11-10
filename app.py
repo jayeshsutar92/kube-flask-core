@@ -1,15 +1,30 @@
 import os
 from flask import Flask, request, jsonify
 from pymongo import MongoClient
+from dotenv import load_dotenv
+
+# Load environment variables from .env file into environment
+load_dotenv()
 
 app = Flask(__name__)
 
-# Fetch MongoDB URI dynamically from environment variable
-# Uses an authenticated connection string format: mongodb://<user>:<password>@<host>:<port>/<dbname>?authSource=admin
-MONGODB_URI = os.environ.get(
-    "MONGODB_URI",
-    "mongodb://admin:password@localhost:27017/flask_db?authSource=admin"
+# Read variables into the Flask application context with fallbacks for local testing
+app.config["MONGO_ROOT_USERNAME"] = os.getenv("MONGO_ROOT_USERNAME", "admin")
+app.config["MONGO_ROOT_PASSWORD"] = os.getenv("MONGO_ROOT_PASSWORD", "password123")
+app.config["MONGO_HOST"] = os.getenv("MONGO_HOST", "localhost")
+app.config["MONGO_PORT"] = os.getenv("MONGO_PORT", "27017")
+app.config["MONGO_DB"] = os.getenv("MONGO_DB", "flask_db")
+app.config["MONGO_AUTH_SOURCE"] = os.getenv("MONGO_AUTH_SOURCE", "admin")
+
+# Fallback URI constructed dynamically or read directly from MONGODB_URI
+DEFAULT_MONGO_URI = (
+    f"mongodb://{app.config['MONGO_ROOT_USERNAME']}:{app.config['MONGO_ROOT_PASSWORD']}@"
+    f"{app.config['MONGO_HOST']}:{app.config['MONGO_PORT']}/{app.config['MONGO_DB']}?"
+    f"authSource={app.config['MONGO_AUTH_SOURCE']}"
 )
+
+app.config["MONGODB_URI"] = os.getenv("MONGODB_URI", DEFAULT_MONGO_URI)
+MONGODB_URI = app.config["MONGODB_URI"]
 
 # Initialize PyMongo client with authentication from the URI
 client = MongoClient(MONGODB_URI)
@@ -18,9 +33,9 @@ client = MongoClient(MONGODB_URI)
 try:
     db = client.get_default_database()
     if db is None:
-        db = client["flask_db"]
+        db = client[app.config["MONGO_DB"]]
 except Exception:
-    db = client["flask_db"]
+    db = client[app.config["MONGO_DB"]]
 
 collection = db["data"]
 
@@ -78,6 +93,7 @@ def get_data():
 
 
 if __name__ == "__main__":
-    # Configure to run on host 0.0.0.0 and port 5000
-    app.run(host="0.0.0.0", port=5000)
-
+    # Configure to run on host 0.0.0.0 and port 5000 with fallbacks
+    host = os.getenv("FLASK_HOST", "0.0.0.0")
+    port = int(os.getenv("FLASK_PORT", 5000))
+    app.run(host=host, port=port)

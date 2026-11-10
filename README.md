@@ -100,6 +100,48 @@ A production-ready, containerized microservices application featuring a Python F
 
 ---
 
+## Environment Configuration (`.env`)
+
+The application supports dynamic environment configuration using **`python-dotenv`** to load environment variables from a local `.env` file directly into the Flask application context (`app.config`).
+
+### 1. Sample `.env.example`
+A template file [`.env.example`](file:///d:/Personal%20Project/FarAlpha/.env.example) is provided in the project root:
+```env
+# MongoDB Credentials & Connection Configuration
+MONGO_ROOT_USERNAME=admin
+MONGO_ROOT_PASSWORD=password123
+MONGO_HOST=localhost
+MONGO_PORT=27017
+MONGO_DB=flask_db
+MONGO_AUTH_SOURCE=admin
+
+# Full MongoDB Connection URI (Dynamically read by the Flask app)
+MONGODB_URI=mongodb://admin:password123@localhost:27017/flask_db?authSource=admin
+
+# Flask Server Configuration
+FLASK_HOST=0.0.0.0
+FLASK_PORT=5000
+FLASK_DEBUG=False
+```
+
+### 2. Setup Local Environment File
+To configure local settings:
+```bash
+# On Linux / macOS
+cp .env.example .env
+
+# On Windows PowerShell
+Copy-Item .env.example .env
+```
+
+### 3. Application Context & Fallback Values
+In [`app.py`](file:///d:/Personal%20Project/FarAlpha/app.py), `python-dotenv` loads the `.env` file at startup. If `.env` is omitted or any variable is missing, safe local development fallback values are automatically injected into the Flask context:
+- `MONGODB_URI`: Defaults to `mongodb://admin:password123@localhost:27017/flask_db?authSource=admin`
+- `FLASK_HOST`: Defaults to `0.0.0.0`
+- `FLASK_PORT`: Defaults to `5000`
+
+---
+
 ## 2. Minikube Deployment Steps
 
 ### Step 1: Start the Minikube Cluster
