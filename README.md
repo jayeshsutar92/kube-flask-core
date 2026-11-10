@@ -335,3 +335,4 @@ Configuring `requests < limits` places the Flask pods into the **Burstable** Qua
 3. **Authentication Failure on MongoDB Startup:**
    - *Cause:* When connecting to MongoDB with root credentials created via `MONGO_INITDB_ROOT_USERNAME`, authentication queries defaulted to the target application database (`flask_db`) where the user did not exist.
    - *Fix:* Configured `MONGODB_URI` with explicit query parameter `?authSource=admin`.
+
