@@ -133,6 +133,7 @@ cp .env.example .env
 # On Windows PowerShell
 Copy-Item .env.example .env
 ```
+Don't commit your .env to version control.
 
 ### 3. Application Context & Fallback Values
 In [`app.py`](file:///d:/Personal%20Project/FarAlpha/app.py), `python-dotenv` loads the `.env` file at startup. If `.env` is omitted or any variable is missing, safe local development fallback values are automatically injected into the Flask context:
