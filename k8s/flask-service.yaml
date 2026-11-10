@@ -14,3 +14,4 @@ spec:
       nodePort: 30005
       protocol: TCP
       name: http
+

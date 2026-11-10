@@ -31,3 +31,4 @@ spec:
             limits:
               cpu: "500m" # 0.5 CPU
               memory: "500M"
+
